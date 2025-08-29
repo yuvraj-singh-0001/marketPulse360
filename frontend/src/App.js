@@ -7,18 +7,16 @@ import Dashboard from "./pages/Dashboard";
 function App() {
   return (
     <Router>
-      <Navbar />
       <Routes>
         {/* Default route → Login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<><Navbar /><Login /></>} />
+        <Route path="/register" element={<><Navbar /><Register /></>} />
+        <Route path="/dashboard" element={<Dashboard />} /> {/* No Navbar here */}
       </Routes>
     </Router>
   );
 }
 
 export default App;
-

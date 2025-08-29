@@ -18,9 +18,10 @@ const db = mysql.createConnection({
   database: "market-pulser-360",
 });
 
-// ✅ Auto-create table if it doesn't exist
-const createTableIfNotExists = () => {
-  const createTableQuery = `
+// ✅ Auto-create tables if they don't exist
+const createTablesIfNotExists = () => {
+  // Register table
+  const createRegisterTable = `
     CREATE TABLE IF NOT EXISTS register (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
@@ -30,11 +31,36 @@ const createTableIfNotExists = () => {
     )
   `;
   
-  db.query(createTableQuery, (err) => {
+  // Deliveries table
+  const createDeliveriesTable = `
+    CREATE TABLE IF NOT EXISTS deliveries (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      customer_name VARCHAR(255) NOT NULL,
+      customer_email VARCHAR(255) NOT NULL,
+      customer_phone VARCHAR(20) NOT NULL,
+      delivery_address TEXT NOT NULL,
+      product_name VARCHAR(255) NOT NULL,
+      quantity INT NOT NULL,
+      delivery_date DATE NOT NULL,
+      special_instructions TEXT,
+      status ENUM('pending', 'processing', 'delivered') DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+  
+  db.query(createRegisterTable, (err) => {
     if (err) {
-      console.error("❌ Error creating table:", err.message);
+      console.error("❌ Error creating register table:", err.message);
     } else {
       console.log("✅ Register table is ready!");
+    }
+  });
+  
+  db.query(createDeliveriesTable, (err) => {
+    if (err) {
+      console.error("❌ Error creating deliveries table:", err.message);
+    } else {
+      console.log("✅ Deliveries table is ready!");
     }
   });
 };
@@ -45,7 +71,7 @@ db.connect((err) => {
     return;
   }
   console.log("✅ Connected to MySQL Database!");
-  createTableIfNotExists(); // Create table after connection
+  createTablesIfNotExists(); // Create tables after connection
 });
 
 // ✅ Register API (with password hashing)
@@ -117,6 +143,96 @@ app.post("/login", (req, res) => {
       console.error("❌ Password comparison error:", error);
       res.status(500).json({ message: "Server error" });
     }
+  });
+});
+
+// ✅ Delivery Form API Routes
+
+// Get all deliveries
+app.get('/deliveries', (req, res) => {
+  const query = "SELECT * FROM deliveries ORDER BY created_at DESC";
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("❌ Error fetching deliveries:", err.message);
+      return res.status(500).json({ message: "Database error" });
+    }
+    res.json(results);
+  });
+});
+
+// Create new delivery
+app.post('/deliveries', (req, res) => {
+  const {
+    customer_name,
+    customer_email,
+    customer_phone,
+    delivery_address,
+    product_name,
+    quantity,
+    delivery_date,
+    special_instructions
+  } = req.body;
+
+  // Basic validation
+  if (!customer_name || !customer_email || !customer_phone || !delivery_address || !product_name || !quantity || !delivery_date) {
+    return res.status(400).json({ message: "All required fields must be filled" });
+  }
+
+  const query = `
+    INSERT INTO deliveries 
+    (customer_name, customer_email, customer_phone, delivery_address, product_name, quantity, delivery_date, special_instructions) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const values = [
+    customer_name,
+    customer_email,
+    customer_phone,
+    delivery_address,
+    product_name,
+    quantity,
+    delivery_date,
+    special_instructions || null
+  ];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("❌ Error creating delivery:", err.message);
+      return res.status(500).json({ message: "Database error" });
+    }
+    res.json({ 
+      message: "✅ Delivery order created successfully!", 
+      deliveryId: result.insertId 
+    });
+  });
+});
+
+// Update delivery status
+app.put('/deliveries/:id', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const query = "UPDATE deliveries SET status = ? WHERE id = ?";
+  db.query(query, [status, id], (err, result) => {
+    if (err) {
+      console.error("❌ Error updating delivery:", err.message);
+      return res.status(500).json({ message: "Database error" });
+    }
+    res.json({ message: "✅ Delivery status updated successfully!" });
+  });
+});
+
+// Delete delivery
+app.delete('/deliveries/:id', (req, res) => {
+  const { id } = req.params;
+
+  const query = "DELETE FROM deliveries WHERE id = ?";
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error("❌ Error deleting delivery:", err.message);
+      return res.status(500).json({ message: "Database error" });
+    }
+    res.json({ message: "✅ Delivery deleted successfully!" });
   });
 });
 

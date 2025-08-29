@@ -1,51 +1,107 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, Users, TrendingUp, DollarSign } from "lucide-react";
+import { BarChart3, Users, TrendingUp, DollarSign, Package } from "lucide-react";
+import Sidebar from "../components/sidebar";
+import DeliveryForm from "../components/DeliveryForm";
 
 function Dashboard() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const user = JSON.parse(localStorage.getItem("user"));
+  
   const stats = [
     { title: "Users", value: "1,245", icon: <Users size={28} />, color: "from-blue-500 to-indigo-600" },
     { title: "Revenue", value: "$24,560", icon: <DollarSign size={28} />, color: "from-green-500 to-emerald-600" },
     { title: "Growth", value: "+12.5%", icon: <TrendingUp size={28} />, color: "from-pink-500 to-rose-600" },
-    { title: "Reports", value: "320", icon: <BarChart3 size={28} />, color: "from-purple-500 to-indigo-600" },
+    { title: "Deliveries", value: "320", icon: <Package size={28} />, color: "from-purple-500 to-indigo-600" },
   ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white pt-20 px-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-6xl mx-auto text-center mb-10"
-      >
-        <h1 className="text-4xl font-extrabold">Welcome Back 👋</h1>
-        <p className="mt-2 text-gray-300 text-lg">
-          Here’s an overview of your MarketPulse360 dashboard
-        </p>
-      </motion.div>
-
-      {/* Stats Cards */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
-      >
-        {stats.map((item, i) => (
+  const renderContent = () => {
+    switch (activeTab) {
+      case "delivery":
+        return (
           <motion.div
-            key={i}
-            whileHover={{ scale: 1.05 }}
-            className={`bg-gradient-to-r ${item.color} p-6 rounded-2xl shadow-lg flex items-center justify-between`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <div>
-              <p className="text-gray-200 text-sm">{item.title}</p>
-              <h2 className="text-2xl font-bold">{item.value}</h2>
-            </div>
-            <div className="text-white">{item.icon}</div>
+            <DeliveryForm />
           </motion.div>
-        ))}
-      </motion.div>
+        );
+      
+      case "dashboard":
+      default:
+        return (
+          <>
+            {/* Stats Cards */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"
+            >
+              {stats.map((item, i) => (
+                <motion.div
+                  key={i}
+                  whileHover={{ scale: 1.05 }}
+                  className={`bg-gradient-to-r ${item.color} p-6 rounded-2xl shadow-lg flex items-center justify-between`}
+                >
+                  <div>
+                    <p className="text-gray-200 text-sm">{item.title}</p>
+                    <h2 className="text-2xl font-bold">{item.value}</h2>
+                  </div>
+                  <div className="text-white">{item.icon}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Welcome Message */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+            >
+              <h2 className="text-2xl font-bold mb-4">Welcome to MarketPulse360! 🎉</h2>
+              <p className="text-gray-300">
+                Manage your deliveries, track analytics, and grow your business from one centralized dashboard.
+              </p>
+            </motion.div>
+          </>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white flex">
+      {/* Sidebar */}
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      {/* Main Content */}
+      <div className="flex-1 ml-64"> {/* Remove padding from here */}
+        {/* Header - Moved to top */}
+        <div className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700 px-8 py-6">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-3xl font-extrabold capitalize mb-2">
+              {activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}
+            </h1>
+            <p className="text-gray-300">
+              {activeTab === 'dashboard' 
+                ? "Welcome to your MarketPulse360 command center" 
+                : `Manage your ${activeTab} operations efficiently`
+              }
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Content Area - Now starts immediately after header */}
+        <div className="p-8">
+          {renderContent()}
+        </div>
+      </div>
     </div>
   );
 }
