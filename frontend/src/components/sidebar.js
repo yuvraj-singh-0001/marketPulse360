@@ -8,11 +8,12 @@ import {
   Settings, 
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  User
 } from "lucide-react";
 
-function Sidebar({ activeTab, setActiveTab }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <Home size={20} /> },
@@ -32,9 +33,10 @@ function Sidebar({ activeTab, setActiveTab }) {
     <motion.div
       initial={{ x: -300 }}
       animate={{ x: 0 }}
+      transition={{ duration: 0.3 }}
       className={`bg-gradient-to-b from-gray-800 to-gray-900 text-white h-screen fixed left-0 top-0 ${
         isCollapsed ? 'w-16' : 'w-64'
-      } transition-all duration-300 z-50`}
+      } transition-all duration-300 z-50 flex flex-col shadow-2xl`}
     >
       {/* Sidebar Header */}
       <div className="p-4 border-b border-gray-700">
@@ -43,6 +45,7 @@ function Sidebar({ activeTab, setActiveTab }) {
             <motion.h1 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
               className="text-xl font-bold text-white"
             >
               MarketPulse360
@@ -50,61 +53,88 @@ function Sidebar({ activeTab, setActiveTab }) {
           )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-lg hover:bg-gray-700 transition"
+            className="p-2 rounded-lg hover:bg-gray-700 transition duration-200"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
         </div>
       </div>
 
+      {/* User Info - Only show when not collapsed */}
+      {!isCollapsed && user && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="p-4 border-b border-gray-700"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+              <User size={18} />
+            </div>
+            <div>
+              <p className="font-medium text-sm">{user.name}</p>
+              <p className="text-gray-400 text-xs">{user.email}</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Navigation Menu */}
-      <nav className="p-4">
+      <nav className="p-4 flex-1">
         <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.id}>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center p-3 rounded-lg transition-all ${
+                className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
                   activeTab === item.id
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-blue-600 text-white shadow-lg'
                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                 }`}
+                title={isCollapsed ? item.label : ''}
               >
                 <span className="flex-shrink-0">{item.icon}</span>
                 {!isCollapsed && (
                   <motion.span
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="ml-3 font-medium"
+                    transition={{ duration: 0.2 }}
+                    className="ml-3 font-medium text-sm"
                   >
                     {item.label}
                   </motion.span>
                 )}
-              </button>
+              </motion.button>
             </li>
           ))}
         </ul>
       </nav>
 
-      {/* User Info & Logout */}
-      <div className="absolute bottom-4 left-0 right-0 px-4">
-        <div className="border-t border-gray-700 pt-4">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition"
-          >
-            <LogOut size={20} />
-            {!isCollapsed && (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="ml-3 font-medium"
-              >
-                Logout
-              </motion.span>
-            )}
-          </button>
-        </div>
+      {/* Logout */}
+      <div className="p-4 border-t border-gray-700">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleLogout}
+          className="w-full flex items-center p-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition duration-200"
+          title={isCollapsed ? "Logout" : ""}
+        >
+          <LogOut size={20} />
+          {!isCollapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="ml-3 font-medium text-sm"
+            >
+              Logout
+            </motion.span>
+          )}
+        </motion.button>
       </div>
     </motion.div>
   );

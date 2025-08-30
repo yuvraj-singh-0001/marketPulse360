@@ -6,6 +6,7 @@ import DeliveryForm from "../components/DeliveryForm";
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
   
   const stats = [
@@ -15,18 +16,13 @@ function Dashboard() {
     { title: "Deliveries", value: "320", icon: <Package size={28} />, color: "from-purple-500 to-indigo-600" },
   ];
 
+  // Calculate main content margin based on sidebar state
+  const mainContentMargin = isSidebarCollapsed ? 'ml-16' : 'ml-64';
+
   const renderContent = () => {
     switch (activeTab) {
       case "delivery":
-        return (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <DeliveryForm />
-          </motion.div>
-        );
+        return <DeliveryForm />;
       
       case "dashboard":
       default:
@@ -74,33 +70,35 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white flex">
       {/* Sidebar */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        isCollapsed={isSidebarCollapsed}
+        setIsCollapsed={setIsSidebarCollapsed}
+      />
       
-      {/* Main Content */}
-      <div className="flex-1 ml-64"> {/* Remove padding from here */}
-        {/* Header - Moved to top */}
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700 px-8 py-6">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-3xl font-extrabold capitalize mb-2">
-              {activeTab === 'dashboard' ? 'Dashboard Overview' : activeTab}
-            </h1>
-            <p className="text-gray-300">
-              {activeTab === 'dashboard' 
-                ? "Welcome to your MarketPulse360 command center" 
-                : `Manage your ${activeTab} operations efficiently`
-              }
-            </p>
-          </motion.div>
-        </div>
+      {/* Main Content - Responsive to sidebar */}
+      <div className={`flex-1 ${mainContentMargin} transition-all duration-300 p-6`}>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-10"
+        >
+          <h1 className="text-3xl font-extrabold capitalize">
+            {activeTab === 'dashboard' ? 'Overview' : activeTab}
+          </h1>
+          <p className="mt-2 text-gray-300">
+            {activeTab === 'dashboard' 
+              ? "Here's an overview of your MarketPulse360 dashboard" 
+              : `Manage your ${activeTab} operations`
+            }
+          </p>
+        </motion.div>
 
-        {/* Content Area - Now starts immediately after header */}
-        <div className="p-8">
-          {renderContent()}
-        </div>
+        {/* Content */}
+        {renderContent()}
       </div>
     </div>
   );

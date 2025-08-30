@@ -14,6 +14,7 @@ function App() {
         <Route path="/login" element={<><Navbar /><Login /></>} />
         <Route path="/register" element={<><Navbar /><Register /></>} />
         <Route path="/dashboard" element={<Dashboard />} /> {/* No Navbar here */}
+       
       </Routes>
     </Router>
   );
