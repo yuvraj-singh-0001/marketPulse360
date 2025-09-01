@@ -104,8 +104,8 @@ function Delivery() {
       onClick={() => setActiveTab("form")}
       className={`px-5 py-2 rounded-lg font-medium transition ${
         activeTab === "form"
-          ? "bg-blue-600 text-white"
-          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+          ? "bg-blue-600 text-white  hover:bg-blue-700"
+          : "bg-gray-200 text-gray-800 hover:bg-gray-400"
       }`}
     >
       Create Order
@@ -114,8 +114,8 @@ function Delivery() {
       onClick={() => setActiveTab("track")}
       className={`px-5 py-2 rounded-lg font-medium transition ${
         activeTab === "track"
-          ? "bg-blue-600 text-white"
-          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+          ? "bg-blue-600 text-white hover:bg-blue-700"
+          : "bg-gray-200 text-gray-800 hover:bg-gray-400"
       }`}
     >
       Track Orders
@@ -134,7 +134,7 @@ function Delivery() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Truck size={22} className="text-blue-600" />
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-white-900">
                 Create Delivery Order
               </h2>
             </div>
@@ -145,7 +145,7 @@ function Delivery() {
                 <div className="bg-white/5 rounded-xl p-5 border border-white/10">
                   <div className="flex items-center gap-2 mb-4">
                     <User size={18} className="text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">
+                    <h3 className="text-lg font-semibold text-white-800">
                       Customer Information
                     </h3>
                   </div>
@@ -157,7 +157,7 @@ function Delivery() {
                       onChange={handleChange}
                       placeholder="Full Name"
                       required
-                      className="w-full p-3 text-sm border rounded-lg"
+                      className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-800"
                     />
                     <input
                       type="email"
@@ -166,7 +166,7 @@ function Delivery() {
                       onChange={handleChange}
                       placeholder="Email"
                       required
-                      className="w-full p-3 text-sm border rounded-lg"
+                      className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
                     />
                     <input
                       type="tel"
@@ -175,7 +175,7 @@ function Delivery() {
                       onChange={handleChange}
                       placeholder="Phone"
                       required
-                      className="w-full p-3 text-sm border rounded-lg"
+                      className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -184,7 +184,7 @@ function Delivery() {
                 <div className="bg-white/5 rounded-xl p-5 border border-white/10">
                   <div className="flex items-center gap-2 mb-4">
                     <Package size={18} className="text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">
+                    <h3 className="text-lg font-semibold text-white-800">
                       Delivery Details
                     </h3>
                   </div>
@@ -196,7 +196,7 @@ function Delivery() {
                       onChange={handleChange}
                       placeholder="Product Name"
                       required
-                      className="w-full p-3 text-sm border rounded-lg"
+                      className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
                     />
                     <div className="grid grid-cols-2 gap-4">
                       <input
@@ -206,7 +206,7 @@ function Delivery() {
                         onChange={handleChange}
                         min="1"
                         required
-                        className="w-full p-3 text-sm border rounded-lg"
+                   className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
                       />
                       <input
                         type="date"
@@ -214,7 +214,7 @@ function Delivery() {
                         value={formData.delivery_date}
                         onChange={handleChange}
                         required
-                        className="w-full p-3 text-sm border rounded-lg"
+                        className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
                       />
                     </div>
                     <textarea
@@ -224,14 +224,14 @@ function Delivery() {
                       placeholder="Delivery Address"
                       rows="3"
                       required
-                      className="w-full p-3 text-sm border rounded-lg resize-none"
+                      className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400 resize-none"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Submit Button */}
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center pt-4 hover:scale-105">
                 <motion.button
                   type="submit"
                   disabled={loading}
