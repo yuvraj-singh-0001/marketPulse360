@@ -23,21 +23,16 @@ function Delivery() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [deliveries, setDeliveries] = useState([]);
-  const [view, setView] = useState("form"); // "form" | "track"
+  const [activeTab, setActiveTab] = useState("form"); // default form tab
 
-  // Fetch orders on load
   useEffect(() => {
     fetchDeliveries();
   }, []);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Submit new order
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -47,9 +42,7 @@ function Delivery() {
     try {
       const response = await fetch("http://localhost:5000/deliveries", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
@@ -58,7 +51,6 @@ function Delivery() {
       if (response.ok) {
         setMessage("✅ Delivery order created successfully!");
         setSuccess(true);
-
         setFormData({
           customer_name: "",
           customer_email: "",
@@ -68,29 +60,23 @@ function Delivery() {
           quantity: 1,
           delivery_date: "",
         });
-
-        fetchDeliveries(); // refresh table
+        fetchDeliveries();
       } else {
         setMessage(`❌ ${data.message || "Failed to create delivery order"}`);
-        setSuccess(false);
       }
     } catch (error) {
-      console.error("Error creating delivery:", error);
       setMessage("❌ Network error. Please check if server is running");
-      setSuccess(false);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch deliveries
   const fetchDeliveries = async () => {
     try {
       const response = await fetch("http://localhost:5000/deliveries");
       const data = await response.json();
       setDeliveries(data);
-    } catch (error) {
-      console.error("Error fetching deliveries:", error);
+    } catch {
       setMessage("❌ Failed to load delivery orders");
     }
   };
@@ -105,41 +91,46 @@ function Delivery() {
   };
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 p-6">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex justify-between items-center bg-white/20 rounded-lg px-6 py-3 shadow">
-          <h1 className="text-2xl font-bold text-gray-800">Manage Your Orders</h1>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setView("form")}
-              className={`px-4 py-2 rounded-lg font-medium ${
-                view === "form"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              Create Order
-            </button>
-            <button
-              onClick={() => setView("track")}
-              className={`px-4 py-2 rounded-lg font-medium ${
-                view === "track"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              Track Orders
-            </button>
-          </div>
-        </div>
+        {/* Heading */}
+        <div className="flex justify-between items-center mb-6">
+  {/* Left Side - Heading */}
+  <h1 className="text-3xl font-bold text-white">Manage Your Delivery</h1>
 
-        {/* Create Order Form */}
-        {view === "form" && (
+  {/* Right Side - Tab Buttons */}
+  <div className="flex gap-4">
+    <button
+      onClick={() => setActiveTab("form")}
+      className={`px-5 py-2 rounded-lg font-medium transition ${
+        activeTab === "form"
+          ? "bg-blue-600 text-white"
+          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+      }`}
+    >
+      Create Order
+    </button>
+    <button
+      onClick={() => setActiveTab("track")}
+      className={`px-5 py-2 rounded-lg font-medium transition ${
+        activeTab === "track"
+          ? "bg-blue-600 text-white"
+          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+      }`}
+    >
+      Track Orders
+    </button>
+  </div>
+</div>
+
+
+        {/* Tab Content */}
+        {activeTab === "form" && (
           <motion.div
+            key="form"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl"
+            className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl"
           >
             <div className="flex items-center gap-2 mb-4">
               <Truck size={22} className="text-blue-600" />
@@ -158,7 +149,6 @@ function Delivery() {
                       Customer Information
                     </h3>
                   </div>
-
                   <div className="space-y-4">
                     <input
                       type="text"
@@ -198,7 +188,6 @@ function Delivery() {
                       Delivery Details
                     </h3>
                   </div>
-
                   <div className="space-y-4">
                     <input
                       type="text"
@@ -248,7 +237,7 @@ function Delivery() {
                   disabled={loading}
                   whileHover={{ scale: loading ? 1 : 1.02 }}
                   whileTap={{ scale: loading ? 1 : 0.98 }}
-                  className="w-full max-w-md px-6 py-3 bg-blue-600 text-white font-medium rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 text-base hover:bg-blue-700"
+                  className="w-full max-w-md px-6 py-3 bg-blue-600 text-white font-medium rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-blue-700"
                 >
                   {loading ? (
                     <>
@@ -291,12 +280,12 @@ function Delivery() {
           </motion.div>
         )}
 
-        {/* Orders Table */}
-        {view === "track" && (
+        {activeTab === "track" && (
           <motion.div
+            key="track"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl"
+            className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl"
           >
             <div className="flex items-center gap-2 mb-4">
               <List size={22} className="text-blue-600" />
@@ -304,7 +293,6 @@ function Delivery() {
                 Delivery Orders ({deliveries.length})
               </h2>
             </div>
-
             {deliveries.length === 0 ? (
               <p className="text-gray-600">No delivery orders yet.</p>
             ) : (
@@ -326,12 +314,8 @@ function Delivery() {
                         key={delivery.id}
                         className="border-b border-gray-300 hover:bg-gray-100"
                       >
-                        <td className="px-4 py-2">
-                          {delivery.customer_name}
-                        </td>
-                        <td className="px-4 py-2">
-                          {delivery.product_name}
-                        </td>
+                        <td className="px-4 py-2">{delivery.customer_name}</td>
+                        <td className="px-4 py-2">{delivery.product_name}</td>
                         <td className="px-4 py-2">{delivery.quantity}</td>
                         <td className="px-4 py-2">
                           {formatDate(delivery.delivery_date)}
