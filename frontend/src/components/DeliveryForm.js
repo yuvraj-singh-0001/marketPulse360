@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Truck, CheckCircle, XCircle, List, Plus, ArrowLeft } from 'lucide-react';
+import { Truck, CheckCircle, XCircle, List, Plus, User, Package, MapPin, Calendar } from 'lucide-react';
 
 function Delivery() {
   const [formData, setFormData] = useState({
@@ -15,7 +15,7 @@ function Delivery() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [view, setView] = useState('create'); // 'create' or 'track'
+  const [view, setView] = useState('create');
   const [deliveries, setDeliveries] = useState([]);
   const [trackLoading, setTrackLoading] = useState(false);
 
@@ -118,83 +118,60 @@ function Delivery() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 p-5">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="mb-6 text-center"
-      >
-        <h1 className="text-2xl font-bold text-white">Delivery Management</h1>
-        <p className="text-gray-300 text-base mt-1">
-          {view === 'create' ? 'Create new delivery orders' : 'Track your delivery orders'}
-        </p>
-      </motion.div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-center gap-4 mb-6">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={showCreateForm}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
-            view === 'create' 
-              ? 'bg-blue-600 text-white' 
-              : 'bg-white/10 text-gray-300 hover:bg-white/20'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Plus size={18} />
-            Create Order
-          </div>
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={fetchDeliveries}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
-            view === 'track' 
-              ? 'bg-blue-600 text-white' 
-              : 'bg-white/10 text-gray-300 hover:bg-white/20'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <List size={18} />
-            Track Orders
-            {trackLoading && (
-              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
-            )}
-          </div>
-        </motion.button>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 p-4 md:p-5">
       {/* Content Area */}
       {view === 'track' ? (
         /* Track Orders View */
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-4xl mx-auto bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl"
+          className="w-full bg-white/10 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-white/20 shadow-xl"
         >
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-white">Delivery Management</h1>
+              <p className="text-gray-300 text-sm md:text-base mt-1">
+                Track your delivery orders
+              </p>
+            </div>
+            
+            {/* Buttons in the content area */}
+            <div className="flex gap-2 md:gap-3">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={showCreateForm}
+                className="px-3 md:px-4 py-2 bg-white/10 text-gray-300 hover:bg-white/20 rounded-lg font-medium transition flex items-center gap-2"
+              >
+                <Plus size={16} className="md:size-[18px]" />
+                <span className="hidden md:inline">Create</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={fetchDeliveries}
+                className="px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg font-medium transition flex items-center gap-2"
+              >
+                <List size={16} className="md:size-[18px]" />
+                <span className="hidden md:inline">Refresh</span>
+                {trackLoading && (
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white ml-1"></div>
+                )}
+              </motion.button>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-              <List size={24} />
+            <h2 className="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
+              <List size={20} className="md:size-6" />
               Delivery Orders ({deliveries.length})
             </h2>
-            <button
-              onClick={showCreateForm}
-              className="flex items-center gap-2 text-gray-300 hover:text-white transition"
-            >
-              <Plus size={16} />
-              New Order
-            </button>
           </div>
 
           {deliveries.length === 0 ? (
             <div className="text-center py-8 text-gray-300">
-              <Truck size={48} className="mx-auto mb-4 opacity-50" />
+              <Truck size={40} className="mx-auto mb-4 opacity-50 md:size-12" />
               <p>No delivery orders found</p>
               <p className="text-sm mt-2">Create your first delivery order to get started</p>
               <button
@@ -213,12 +190,12 @@ function Delivery() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-white/20 transition"
                 >
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex flex-col md:flex-row justify-between items-start mb-3 gap-2">
                     <div>
-                      <h3 className="font-semibold text-white text-lg">{delivery.customer_name}</h3>
-                      <p className="text-gray-300">{delivery.product_name} × {delivery.quantity}</p>
+                      <h3 className="font-semibold text-white text-base md:text-lg">{delivery.customer_name}</h3>
+                      <p className="text-gray-300 text-sm md:text-base">{delivery.product_name} × {delivery.quantity}</p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(delivery.status)}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(delivery.status)}`}>
                       {delivery.status.toUpperCase()}
                     </span>
                   </div>
@@ -249,146 +226,194 @@ function Delivery() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-2xl mx-auto bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl"
+          className="w-full bg-white/10 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-white/20 shadow-xl"
         >
-          {/* Form Header */}
-          <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <Truck size={24} className="text-blue-400" />
-              <h2 className="text-xl font-semibold text-white">Create Delivery Order</h2>
+          {/* Form Header with buttons */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-white">Delivery Management</h1>
+              <p className="text-gray-300 text-sm md:text-base mt-1">
+                Create new delivery orders
+              </p>
+            </div>
+            
+            {/* Buttons in the content area */}
+            <div className="flex gap-2 md:gap-3">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={showCreateForm}
+                className="px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg font-medium transition flex items-center gap-2"
+              >
+                <Plus size={16} className="md:size-[18px]" />
+                <span className="hidden md:inline">Create</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={fetchDeliveries}
+                className="px-3 md:px-4 py-2 bg-white/10 text-gray-300 hover:bg-white/20 rounded-lg font-medium transition flex items-center gap-2"
+              >
+                <List size={16} className="md:size-[18px]" />
+                <span className="hidden md:inline">Track</span>
+              </motion.button>
+            </div>
+          </div>
+
+          <div className="mb-4 md:mb-6">
+            <div className="flex items-center gap-2 md:gap-3 mb-2">
+              <Truck size={20} className="text-blue-400 md:size-6" />
+              <h2 className="text-lg md:text-xl font-semibold text-white">Create Delivery Order</h2>
             </div>
             <p className="text-gray-300 text-sm">Fill all fields to create a new delivery</p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Improved Form Layout */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left Column - Customer Information */}
+              <div className="bg-white/5 rounded-xl p-5 border border-white/10">
+                <div className="flex items-center gap-2 mb-4">
+                  <User size={18} className="text-blue-400" />
+                  <h3 className="text-lg font-semibold text-white">Customer Information</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-gray-200 text-sm font-medium mb-2">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="customer_name"
+                      value={formData.customer_name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter customer's full name"
+                      className="w-full p-3 text-sm bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                      disabled={loading}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-200 text-sm font-medium mb-2">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="customer_email"
+                      value={formData.customer_email}
+                      onChange={handleChange}
+                      required
+                      placeholder="email@example.com"
+                      className="w-full p-3 text-sm bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                      disabled={loading}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-200 text-sm font-medium mb-2">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      name="customer_phone"
+                      value={formData.customer_phone}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter phone number"
+                      className="w-full p-3 text-sm bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Right Column - Delivery Details */}
+              <div className="bg-white/5 rounded-xl p-5 border border-white/10">
+                <div className="flex items-center gap-2 mb-4">
+                  <Package size={18} className="text-blue-400" />
+                  <h3 className="text-lg font-semibold text-white">Delivery Details</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-gray-200 text-sm font-medium mb-2">
+                      Product Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="product_name"
+                      value={formData.product_name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter product name"
+                      className="w-full p-3 text-sm bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                      disabled={loading}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-200 text-sm font-medium mb-2">
+                        Quantity *
+                      </label>
+                      <input
+                        type="number"
+                        name="quantity"
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        min="1"
+                        required
+                        className="w-full p-3 text-sm bg-white/5 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                        disabled={loading}
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-gray-200 text-sm font-medium mb-2">
+                        Delivery Date *
+                      </label>
+                      <input
+                        type="date"
+                        name="delivery_date"
+                        value={formData.delivery_date}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-3 text-sm bg-white/5 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-200 text-sm font-medium mb-2">
+                      Delivery Address *
+                    </label>
+                    <textarea
+                      name="delivery_address"
+                      value={formData.delivery_address}
+                      onChange={handleChange}
+                      required
+                      rows="3"
+                      placeholder="Enter complete delivery address"
+                      className="w-full p-3 text-sm bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
             
-            {/* Customer Name */}
-            <div>
-              <label className="block text-gray-200 text-sm font-medium mb-2">
-                Customer Name *
-              </label>
-              <input
-                type="text"
-                name="customer_name"
-                value={formData.customer_name}
-                onChange={handleChange}
-                required
-                placeholder="Enter full name"
-                className="w-full p-3 text-base bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                disabled={loading}
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-gray-200 text-sm font-medium mb-2">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                name="customer_email"
-                value={formData.customer_email}
-                onChange={handleChange}
-                required
-                placeholder="email@example.com"
-                className="w-full p-3 text-base bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                disabled={loading}
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-gray-200 text-sm font-medium mb-2">
-                Phone Number *
-              </label>
-              <input
-                type="tel"
-                name="customer_phone"
-                value={formData.customer_phone}
-                onChange={handleChange}
-                required
-                placeholder="Enter phone number"
-                className="w-full p-3 text-base bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                disabled={loading}
-              />
-            </div>
-
-            {/* Delivery Date */}
-            <div>
-              <label className="block text-gray-200 text-sm font-medium mb-2">
-                Delivery Date *
-              </label>
-              <input
-                type="date"
-                name="delivery_date"
-                value={formData.delivery_date}
-                onChange={handleChange}
-                required
-                className="w-full p-3 text-base bg-white/5 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                disabled={loading}
-              />
-            </div>
-
-            {/* Product Name */}
-            <div>
-              <label className="block text-gray-200 text-sm font-medium mb-2">
-                Product Name *
-              </label>
-              <input
-                type="text"
-                name="product_name"
-                value={formData.product_name}
-                onChange={handleChange}
-                required
-                placeholder="Enter product name"
-                className="w-full p-3 text-base bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                disabled={loading}
-              />
-            </div>
-
-            {/* Quantity */}
-            <div>
-              <label className="block text-gray-200 text-sm font-medium mb-2">
-                Quantity *
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                min="1"
-                required
-                className="w-full p-3 text-base bg-white/5 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                disabled={loading}
-              />
-            </div>
-
-            {/* Delivery Address */}
-            <div className="md:col-span-2">
-              <label className="block text-gray-200 text-sm font-medium mb-2">
-                Delivery Address *
-              </label>
-              <textarea
-                name="delivery_address"
-                value={formData.delivery_address}
-                onChange={handleChange}
-                required
-                rows="3"
-                placeholder="Enter complete delivery address"
-                className="w-full p-3 text-base bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
-                disabled={loading}
-              />
-            </div>
-
             {/* Submit Button */}
-            <div className="md:col-span-2 flex justify-center mt-4">
+            <div className="flex justify-center pt-4">
               <motion.button
                 type="submit"
                 disabled={loading}
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 text-base hover:bg-blue-700"
+                className="w-full max-w-md px-6 py-3 bg-blue-600 text-white font-medium rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 text-base hover:bg-blue-700"
               >
                 {loading ? (
                   <>
@@ -400,7 +425,7 @@ function Delivery() {
                     <CheckCircle size={18} />
                     Create Delivery Order
                   </>
-                )}
+              )}
               </motion.button>
             </div>
 
@@ -409,7 +434,7 @@ function Delivery() {
               <motion.div
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="md:col-span-2 p-3 rounded-lg border text-sm flex items-center gap-2 mt-3"
+                className="p-3 rounded-lg border text-sm flex items-center gap-2 mt-3"
                 style={{
                   backgroundColor: success ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                   borderColor: success ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)',

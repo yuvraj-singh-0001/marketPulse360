@@ -78,23 +78,15 @@ function Dashboard() {
       />
       
       {/* Main Content - Responsive to sidebar */}
-      <div className={`flex-1 ${mainContentMargin} transition-all duration-300 p-6`}>
+      <div className={`flex-1 ${mainContentMargin} transition-all duration-300 `}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-10"
+          className="bt-6"
         >
-          <h1 className="text-3xl font-extrabold capitalize">
-            {activeTab === 'dashboard' ? 'Overview' : activeTab}
-          </h1>
-          <p className="mt-2 text-gray-300">
-            {activeTab === 'dashboard' 
-              ? "Here's an overview of your MarketPulse360 dashboard" 
-              : `Manage your ${activeTab} operations`
-            }
-          </p>
+         
         </motion.div>
 
         {/* Content */}
