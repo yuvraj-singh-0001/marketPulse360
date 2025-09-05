@@ -24,6 +24,7 @@ function Delivery() {
   const [success, setSuccess] = useState(false);
   const [deliveries, setDeliveries] = useState([]);
   const [activeTab, setActiveTab] = useState("form"); // default form tab
+  const [editingId, setEditingId] = useState(null); // track editing mode
 
   useEffect(() => {
     fetchDeliveries();
@@ -33,6 +34,7 @@ function Delivery() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Create or Update
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,8 +42,13 @@ function Delivery() {
     setSuccess(false);
 
     try {
-      const response = await fetch("http://localhost:5000/deliveries", {
-        method: "POST",
+      const url = editingId
+        ? `http://localhost:5000/deliveries/${editingId}`
+        : "http://localhost:5000/deliveries";
+      const method = editingId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -49,7 +56,11 @@ function Delivery() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Delivery order created successfully!");
+        setMessage(
+          editingId
+            ? "✅ Order updated successfully!"
+            : "✅ Delivery order created successfully!"
+        );
         setSuccess(true);
         setFormData({
           customer_name: "",
@@ -60,9 +71,10 @@ function Delivery() {
           quantity: 1,
           delivery_date: "",
         });
+        setEditingId(null);
         fetchDeliveries();
       } else {
-        setMessage(`❌ ${data.message || "Failed to create delivery order"}`);
+        setMessage(`❌ ${data.message || "Failed to save order"}`);
       }
     } catch (error) {
       setMessage("❌ Network error. Please check if server is running");
@@ -71,6 +83,7 @@ function Delivery() {
     }
   };
 
+  // Fetch all deliveries
   const fetchDeliveries = async () => {
     try {
       const response = await fetch("http://localhost:5000/deliveries");
@@ -78,6 +91,43 @@ function Delivery() {
       setDeliveries(data);
     } catch {
       setMessage("❌ Failed to load delivery orders");
+    }
+  };
+
+  // Edit order
+  const handleEdit = (delivery) => {
+    setActiveTab("form");
+    setFormData({
+      customer_name: delivery.customer_name,
+      customer_email: delivery.customer_email,
+      customer_phone: delivery.customer_phone,
+      delivery_address: delivery.delivery_address,
+      product_name: delivery.product_name,
+      quantity: delivery.quantity,
+      delivery_date: delivery.delivery_date.split("T")[0], // fix for input type="date"
+    });
+    setEditingId(delivery.id);
+  };
+
+  // Delete order
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this order?")) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/deliveries/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        setMessage("✅ Order deleted successfully!");
+        setSuccess(true);
+        fetchDeliveries();
+      } else {
+        setMessage("❌ Failed to delete order");
+        setSuccess(false);
+      }
+    } catch (error) {
+      setMessage("❌ Network error while deleting");
+      setSuccess(false);
     }
   };
 
@@ -95,34 +145,44 @@ function Delivery() {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Heading */}
         <div className="flex justify-between items-center mb-6">
-  {/* Left Side - Heading */}
-  <h1 className="text-3xl font-bold text-white">Manage Your Delivery</h1>
+          <h1 className="text-3xl font-bold text-white">Manage Your Delivery</h1>
 
-  {/* Right Side - Tab Buttons */}
-  <div className="flex gap-4">
-    <button
-      onClick={() => setActiveTab("form")}
-      className={`px-5 py-2 rounded-lg font-medium transition ${
-        activeTab === "form"
-          ? "bg-blue-600 text-white  hover:bg-blue-700"
-          : "bg-gray-200 text-gray-800 hover:bg-gray-400"
-      }`}
-    >
-      Create Order
-    </button>
-    <button
-      onClick={() => setActiveTab("track")}
-      className={`px-5 py-2 rounded-lg font-medium transition ${
-        activeTab === "track"
-          ? "bg-blue-600 text-white hover:bg-blue-700"
-          : "bg-gray-200 text-gray-800 hover:bg-gray-400"
-      }`}
-    >
-      Track Orders
-    </button>
-  </div>
-</div>
-
+          {/* Tabs */}
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                setActiveTab("form");
+                setEditingId(null);
+                setFormData({
+                  customer_name: "",
+                  customer_email: "",
+                  customer_phone: "",
+                  delivery_address: "",
+                  product_name: "",
+                  quantity: 1,
+                  delivery_date: "",
+                });
+              }}
+              className={`px-5 py-2 rounded-lg font-medium transition ${
+                activeTab === "form"
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-400"
+              }`}
+            >
+              {editingId ? "Edit Order" : "Create Order"}
+            </button>
+            <button
+              onClick={() => setActiveTab("track")}
+              className={`px-5 py-2 rounded-lg font-medium transition ${
+                activeTab === "track"
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-400"
+              }`}
+            >
+              Track Orders
+            </button>
+          </div>
+        </div>
 
         {/* Tab Content */}
         {activeTab === "form" && (
@@ -134,18 +194,19 @@ function Delivery() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Truck size={22} className="text-blue-600" />
-              <h2 className="text-xl font-bold text-white-900">
-                Create Delivery Order
+              <h2 className="text-xl font-bold text-white">
+                {editingId ? "Edit Delivery Order" : "Create Delivery Order"}
               </h2>
             </div>
 
+            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Customer Info */}
                 <div className="bg-white/5 rounded-xl p-5 border border-white/10">
                   <div className="flex items-center gap-2 mb-4">
                     <User size={18} className="text-blue-600" />
-                    <h3 className="text-lg font-semibold text-white-800">
+                    <h3 className="text-lg font-semibold text-white">
                       Customer Information
                     </h3>
                   </div>
@@ -157,7 +218,7 @@ function Delivery() {
                       onChange={handleChange}
                       placeholder="Full Name"
                       required
-                      className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-800"
+                      className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
                     />
                     <input
                       type="email"
@@ -184,7 +245,7 @@ function Delivery() {
                 <div className="bg-white/5 rounded-xl p-5 border border-white/10">
                   <div className="flex items-center gap-2 mb-4">
                     <Package size={18} className="text-blue-600" />
-                    <h3 className="text-lg font-semibold text-white-800">
+                    <h3 className="text-lg font-semibold text-white">
                       Delivery Details
                     </h3>
                   </div>
@@ -206,7 +267,7 @@ function Delivery() {
                         onChange={handleChange}
                         min="1"
                         required
-                   className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
+                        className="w-full p-3 text-sm border rounded-lg bg-transparent text-white placeholder-gray-400"
                       />
                       <input
                         type="date"
@@ -242,12 +303,12 @@ function Delivery() {
                   {loading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Creating Order...
+                      {editingId ? "Updating Order..." : "Creating Order..."}
                     </>
                   ) : (
                     <>
                       <CheckCircle size={18} />
-                      Create Delivery Order
+                      {editingId ? "Update Delivery Order" : "Create Delivery Order"}
                     </>
                   )}
                 </motion.button>
@@ -289,16 +350,16 @@ function Delivery() {
           >
             <div className="flex items-center gap-2 mb-4">
               <List size={22} className="text-blue-600" />
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-white">
                 Delivery Orders ({deliveries.length})
               </h2>
             </div>
             {deliveries.length === 0 ? (
-              <p className="text-gray-600">No delivery orders yet.</p>
+              <p className="text-gray-300">No delivery orders yet.</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-gray-800">
-                  <thead className="bg-gray-200">
+                <table className="w-full text-left text-sm text-white">
+                  <thead className="bg-gray-900">
                     <tr>
                       <th className="px-4 py-2">Customer</th>
                       <th className="px-4 py-2">Product</th>
@@ -306,13 +367,14 @@ function Delivery() {
                       <th className="px-4 py-2">Delivery Date</th>
                       <th className="px-4 py-2">Address</th>
                       <th className="px-4 py-2">Created At</th>
+                      <th className="px-4 py-2">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {deliveries.map((delivery) => (
                       <tr
                         key={delivery.id}
-                        className="border-b border-gray-300 hover:bg-gray-100"
+                        className="border-b border-gray-300 hover:bg-gray-800"
                       >
                         <td className="px-4 py-2">{delivery.customer_name}</td>
                         <td className="px-4 py-2">{delivery.product_name}</td>
@@ -325,6 +387,20 @@ function Delivery() {
                         </td>
                         <td className="px-4 py-2">
                           {formatDate(delivery.created_at)}
+                        </td>
+                        <td className="px-4 py-2 flex gap-2">
+                          <button
+                            onClick={() => handleEdit(delivery)}
+                            className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(delivery.id)}
+                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}

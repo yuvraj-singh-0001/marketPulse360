@@ -3,7 +3,7 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
-const pool = require("./config/db"); // ✅ Import pool (promise-based)
+const pool = require("./config/db"); // ✅ MySQL pool (promise-based)
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,7 +23,7 @@ const testDBConnection = async () => {
   }
 };
 
-// ✅ Auto-create tables if they don't exist
+// ✅ Auto-create tables
 const createTablesIfNotExists = async () => {
   try {
     await pool.query(`
@@ -59,50 +59,41 @@ const createTablesIfNotExists = async () => {
 };
 
 // ✅ Register API
-// ✅ Register API (with hashing)
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
-
   if (!name || !email || !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    // 👇 hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    await pool.query(
-      "INSERT INTO register (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPassword]
-    );
-
+    await pool.query("INSERT INTO register (name, email, password) VALUES (?, ?, ?)", [
+      name,
+      email,
+      hashedPassword,
+    ]);
     res.json({ message: "✅ User registered successfully!" });
   } catch (err) {
-    console.error("❌ Error inserting data:", err.message);
+    console.error("❌ Error inserting user:", err.message);
     res.status(500).json({ message: "Database error" });
   }
 });
 
-// ✅ Login API (plain password check)
 // ✅ Login API
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
   try {
     const [users] = await pool.query("SELECT * FROM register WHERE email = ?", [email]);
-
     if (users.length === 0) {
       return res.status(401).json({ message: "❌ Invalid email or password" });
     }
 
     const user = users[0];
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
       return res.status(401).json({ message: "❌ Invalid email or password" });
     }
@@ -116,7 +107,6 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 // ✅ Get all deliveries
 app.get("/deliveries", async (req, res) => {
@@ -178,14 +168,41 @@ app.post("/deliveries", async (req, res) => {
   }
 });
 
-// ✅ Update delivery status
+// ✅ Update delivery (full edit)
 app.put("/deliveries/:id", async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const {
+    customer_name,
+    customer_email,
+    customer_phone,
+    delivery_address,
+    product_name,
+    quantity,
+    delivery_date,
+    special_instructions,
+    status,
+  } = req.body;
 
   try {
-    await pool.query("UPDATE deliveries SET status = ? WHERE id = ?", [status, id]);
-    res.json({ message: "✅ Delivery status updated successfully!" });
+    await pool.query(
+      `UPDATE deliveries 
+       SET customer_name=?, customer_email=?, customer_phone=?, delivery_address=?, 
+           product_name=?, quantity=?, delivery_date=?, special_instructions=?, status=? 
+       WHERE id=?`,
+      [
+        customer_name,
+        customer_email,
+        customer_phone,
+        delivery_address,
+        product_name,
+        quantity,
+        delivery_date,
+        special_instructions || null,
+        status || "pending",
+        id,
+      ]
+    );
+    res.json({ message: "✅ Delivery updated successfully!" });
   } catch (err) {
     console.error("❌ Error updating delivery:", err.message);
     res.status(500).json({ message: "Database error" });
@@ -195,7 +212,6 @@ app.put("/deliveries/:id", async (req, res) => {
 // ✅ Delete delivery
 app.delete("/deliveries/:id", async (req, res) => {
   const { id } = req.params;
-
   try {
     await pool.query("DELETE FROM deliveries WHERE id = ?", [id]);
     res.json({ message: "✅ Delivery deleted successfully!" });
