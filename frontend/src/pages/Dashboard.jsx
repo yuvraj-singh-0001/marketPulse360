@@ -60,9 +60,9 @@ const stats = [
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+              className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border  border-white/10"
             >
-              <h2 className="text-2xl font-bold mb-4">Welcome to MarketPulse360! 🎉</h2>
+              <h2 className="text-2xl font-bold mb-4 ">Welcome to MarketPulse360! 🎉</h2>
               <p className="text-gray-300">
                 Manage your deliveries, track analytics, and grow your business from one centralized dashboard.
               </p>
