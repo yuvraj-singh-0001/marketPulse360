@@ -25,10 +25,21 @@ function Delivery() {
   const [deliveries, setDeliveries] = useState([]);
   const [activeTab, setActiveTab] = useState("form"); // default form tab
   const [editingId, setEditingId] = useState(null); // track editing mode
+useEffect(() => {
+  fetchDeliveries();
+}, []);
 
-  useEffect(() => {
-    fetchDeliveries();
-  }, []);
+// Auto hide status after 4 seconds
+useEffect(() => {
+  if (message) {
+    const timer = setTimeout(() => {
+      setMessage("");
+      setSuccess(false);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }
+}, [message]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
