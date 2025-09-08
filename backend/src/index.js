@@ -3,8 +3,8 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
-const pool = require("./config/db"); // ✅ MySQL pool (promise-based)
-
+const pool = require("./config/db"); // ✅. MySQL pool (promise-based)
+const routes = require('./routes/routes'); // Import routes
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -58,55 +58,7 @@ const createTablesIfNotExists = async () => {
   }
 };
 
-// ✅ Register API
-app.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
 
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query("INSERT INTO register (name, email, password) VALUES (?, ?, ?)", [
-      name,
-      email,
-      hashedPassword,
-    ]);
-    res.json({ message: "✅ User registered successfully!" });
-  } catch (err) {
-    console.error("❌ Error inserting user:", err.message);
-    res.status(500).json({ message: "Database error" });
-  }
-});
-
-// ✅ Login API
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
-  }
-
-  try {
-    const [users] = await pool.query("SELECT * FROM register WHERE email = ?", [email]);
-    if (users.length === 0) {
-      return res.status(401).json({ message: "❌ Invalid email or password" });
-    }
-
-    const user = users[0];
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "❌ Invalid email or password" });
-    }
-
-    res.json({
-      message: "✅ Login successful!",
-      user: { id: user.id, name: user.name, email: user.email },
-    });
-  } catch (err) {
-    console.error("❌ Login error:", err.message);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 // ✅ Get all deliveries
 app.get("/deliveries", async (req, res) => {
@@ -220,6 +172,9 @@ app.delete("/deliveries/:id", async (req, res) => {
     res.status(500).json({ message: "Database error" });
   }
 });
+// API routes
+app.use('/api', routes);
+
 
 // ✅ Start server
 app.listen(PORT, async () => {
