@@ -5,7 +5,7 @@ const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
+    return res.status(400).json({ success: false, message: "All fields are required" });
   }
 
   try {
@@ -16,11 +16,17 @@ const register = async (req, res) => {
       hashedPassword,
     ]);
 
-    res.json({ message: "✅ Registration successful!" });
+    res.json({ success: true, message: "✅ Registration successful!" });
   } catch (err) {
     console.error("❌ Register error:", err.message);
-    res.status(500).json({ message: "Server error" });
+
+    // ✅ Agar duplicate entry hai (email already exist)
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({ success: false, message: "❌ This email is already registered!" });
+    }
+
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-module.exports = register;   // 👈 exporting the function directly
+module.exports = register;

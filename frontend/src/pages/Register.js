@@ -18,6 +18,7 @@ function Register() {
     setMessage("");
 
     try {
+      // ✅ Register API
       const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -26,25 +27,25 @@ function Register() {
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.success) {
         setMessage("✅ Registration successful!");
-        
-        // Automatically login after successful registration
-        const loginRes = await fetch("http://localhost:5000/login", {
+
+        // ✅ Automatically login after successful registration
+        const loginRes = await fetch("http://localhost:5000/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: form.email,
-            password: form.password
+            password: form.password,
           }),
         });
 
         const loginData = await loginRes.json();
 
-        if (loginRes.ok) {
+        if (loginRes.ok && loginData.success) {
           // Store user data in localStorage
           localStorage.setItem("user", JSON.stringify(loginData.user));
-          
+
           // Redirect to dashboard after 1 second
           setTimeout(() => navigate("/dashboard"), 1000);
         } else {
@@ -84,7 +85,7 @@ function Register() {
             value={form.name}
             onChange={handleChange}
             required
-            className="w-full p-3 border-1 border-gray-300 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none"
           />
 
           <motion.input
@@ -96,7 +97,7 @@ function Register() {
             value={form.email}
             onChange={handleChange}
             required
-            className="w-full p-3 border-1 border-gray-300 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none"
           />
 
           <motion.input
@@ -108,7 +109,7 @@ function Register() {
             value={form.password}
             onChange={handleChange}
             required
-            className="w-full p-3 border-1 border-gray-300 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none"
           />
 
           <motion.button
