@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const delivery = require("../../api/order/delivery");
+const {deliveries, getdeliveries} = require("../../api/order/delivery");
 
-router.post("/deliveries", delivery);
+
+router.post("/deliveries", deliveries);
+router.get("/getdeliveries", getdeliveries);
 
 module.exports = router;

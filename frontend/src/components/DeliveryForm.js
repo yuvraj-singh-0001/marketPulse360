@@ -97,7 +97,7 @@ useEffect(() => {
   // Fetch all deliveries
   const fetchDeliveries = async () => {
     try {
-      const response = await fetch("http://localhost:5000/deliveries");
+      const response = await fetch("http://localhost:5000/api/orders/getdeliveries");
       const data = await response.json();
       setDeliveries(data);
     } catch {
