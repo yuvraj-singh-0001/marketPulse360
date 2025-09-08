@@ -23,96 +23,7 @@ const testDBConnection = async () => {
   }
 };
 
-// ✅ Auto-create tables
-const createTablesIfNotExists = async () => {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS register (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS deliveries (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        customer_name VARCHAR(255) NOT NULL,
-        customer_email VARCHAR(255) NOT NULL,
-        customer_phone VARCHAR(20) NOT NULL,
-        delivery_address TEXT NOT NULL,
-        product_name VARCHAR(255) NOT NULL,
-        quantity INT NOT NULL,
-        delivery_date DATE NOT NULL,
-        special_instructions TEXT,
-        status ENUM('pending', 'processing', 'delivered') DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    console.log("✅ Tables are ready!");
-  } catch (err) {
-    console.error("❌ Error creating tables:", err.message);
-  }
-};
-
-
-
-
-// ✅ Update delivery (full edit)
-app.put("/deliveries/:id", async (req, res) => {
-  const { id } = req.params;
-  const {
-    customer_name,
-    customer_email,
-    customer_phone,
-    delivery_address,
-    product_name,
-    quantity,
-    delivery_date,
-    special_instructions,
-    status,
-  } = req.body;
-
-  try {
-    await pool.query(
-      `UPDATE deliveries 
-       SET customer_name=?, customer_email=?, customer_phone=?, delivery_address=?, 
-           product_name=?, quantity=?, delivery_date=?, special_instructions=?, status=? 
-       WHERE id=?`,
-      [
-        customer_name,
-        customer_email,
-        customer_phone,
-        delivery_address,
-        product_name,
-        quantity,
-        delivery_date,
-        special_instructions || null,
-        status || "pending",
-        id,
-      ]
-    );
-    res.json({ message: "✅ Delivery updated successfully!" });
-  } catch (err) {
-    console.error("❌ Error updating delivery:", err.message);
-    res.status(500).json({ message: "Database error" });
-  }
-});
-
-// ✅ Delete delivery
-app.delete("/deliveries/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    await pool.query("DELETE FROM deliveries WHERE id = ?", [id]);
-    res.json({ message: "✅ Delivery deleted successfully!" });
-  } catch (err) {
-    console.error("❌ Error deleting delivery:", err.message);
-    res.status(500).json({ message: "Database error" });
-  }
-});
 // API routes
 app.use('/api', routes);
 
@@ -121,5 +32,5 @@ app.use('/api', routes);
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   await testDBConnection();
-  await createTablesIfNotExists();
+
 });

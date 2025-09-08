@@ -50,6 +50,48 @@ const deliveries = async (req, res) => {
   }
 };
 
+
+// ✅ Update delivery (full edit)
+const updatedeliveries = async (req, res) => {
+  const { id } = req.params;
+  const {
+    customer_name,
+    customer_email,
+    customer_phone,
+    delivery_address,
+    product_name,
+    quantity,
+    delivery_date,
+    special_instructions,
+    status,
+  } = req.body;
+
+  try {
+    await pool.query(
+      `UPDATE deliveries 
+       SET customer_name=?, customer_email=?, customer_phone=?, delivery_address=?, 
+           product_name=?, quantity=?, delivery_date=?, special_instructions=?, status=? 
+       WHERE id=?`,
+      [
+        customer_name,
+        customer_email,
+        customer_phone,
+        delivery_address,
+        product_name,
+        quantity,
+        delivery_date,
+        special_instructions || null,
+        status || "pending",
+        id,
+      ]
+    );
+    res.json({ message: "✅ Delivery updated successfully!" });
+  } catch (err) {
+    console.error("❌ Error updating delivery:", err.message);
+    res.status(500).json({ message: "Database error" });
+  }
+};
+
 // ✅ Get all deliveries
 const  getdeliveries = async (req, res) => {
   try {
@@ -60,4 +102,16 @@ const  getdeliveries = async (req, res) => {
     res.status(500).json({ message: "Database error" });
   }
 };
-module.exports = {deliveries, getdeliveries};
+// ✅ Delete delivery
+const   deletedeliveries = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query("DELETE FROM deliveries WHERE id = ?", [id]);
+    res.json({ message: "✅ Delivery deleted successfully!" });
+  } catch (err) {
+    console.error("❌ Error deleting delivery:", err.message);
+    res.status(500).json({ message: "Database error" });
+  }
+};
+
+module.exports = {deliveries, getdeliveries,updatedeliveries ,deletedeliveries};

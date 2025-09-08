@@ -54,7 +54,7 @@ useEffect(() => {
 
     try {
       const url = editingId
-        ? `http://localhost:5000/deliveries/${editingId}`
+        ? `http://localhost:5000/api/orders/updatedeliveries/${editingId}`
         : "http://localhost:5000/api/orders/deliveries";
       const method = editingId ? "PUT" : "POST";
 
@@ -125,7 +125,7 @@ useEffect(() => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/deliveries/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/orders/deletedeliveries/${id}`, {
         method: "DELETE",
       });
       if (response.ok) {
