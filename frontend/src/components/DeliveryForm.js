@@ -55,7 +55,7 @@ useEffect(() => {
     try {
       const url = editingId
         ? `http://localhost:5000/deliveries/${editingId}`
-        : "http://localhost:5000/deliveries";
+        : "http://localhost:5000/api/orders/deliveries";
       const method = editingId ? "PUT" : "POST";
 
       const response = await fetch(url, {
