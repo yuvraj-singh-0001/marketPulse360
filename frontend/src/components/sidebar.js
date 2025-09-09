@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { 
   Home, 
@@ -34,34 +34,34 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
       initial={{ x: -300 }}
       animate={{ x: 0 }}
       transition={{ duration: 0.3 }}
-      className={`bg-gradient-to-b from-gray-800 to-gray-900 text-white h-screen fixed left-0 top-0 ${
-        isCollapsed ? 'w-16' : 'w-64'
-      } transition-all duration-300 z-50 flex flex-col shadow-2xl`}
+      className={`bg-gradient-to-b from-gray-800 to-gray-900 text-white h-screen fixed left-0 top-0 
+        ${isCollapsed ? "w-20" : "w-64"} 
+        transition-all duration-300 z-50 flex flex-col shadow-2xl`}
     >
       {/* Sidebar Header */}
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <motion.h1 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2 }}
-              className="text-xl font-bold text-white"
-            >
-              MarketPulse360
-            </motion.h1>
-          )}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-lg hover:bg-gray-700 transition duration-200"
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      <div className="p-4 border-b border-gray-700 flex items-center justify-between">
+        {!isCollapsed && (
+          <motion.h1 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setActiveTab("dashboard")}
+            className="text-xl font-bold text-white cursor-pointer hover:text-blue-400"
           >
-            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-          </button>
-        </div>
+            MarketPulse360
+          </motion.h1>
+        )}
+
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-2 rounded-lg hover:bg-gray-700 transition duration-200 ml-auto"
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        </button>
       </div>
 
-      {/* User Info - Only show when not collapsed */}
+      {/* User Info */}
       {!isCollapsed && user && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -87,15 +87,17 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
           {menuItems.map((item) => (
             <li key={item.id}>
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
+                className={`w-full flex items-center ${
+                  isCollapsed ? "justify-center" : "justify-start"
+                } p-3 rounded-xl transition-all duration-200 ${
                   activeTab === item.id
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
                 }`}
-                title={isCollapsed ? item.label : ''}
+                title={isCollapsed ? item.label : ""}
               >
                 <span className="flex-shrink-0">{item.icon}</span>
                 {!isCollapsed && (
@@ -117,10 +119,12 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
       {/* Logout */}
       <div className="p-4 border-t border-gray-700">
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleLogout}
-          className="w-full flex items-center p-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition duration-200"
+          className={`w-full flex items-center ${
+            isCollapsed ? "justify-center" : "justify-start"
+          } p-3 rounded-xl text-gray-300 hover:bg-red-600 hover:text-white transition duration-200`}
           title={isCollapsed ? "Logout" : ""}
         >
           <LogOut size={20} />
