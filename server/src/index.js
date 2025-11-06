@@ -8,7 +8,15 @@ const routes = require('./routes/routes'); // Import routes
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// Configure CORS to allow requests from the frontend and permit credentials (cookies)
+const corsOptions = {
+  origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // ✅ Test DB connection

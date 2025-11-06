@@ -1,98 +1,42 @@
-import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+// Navbar removed — empty stub to satisfy any leftover imports.
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
-function Navbar() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const navLinks = [
-    { name: "Login", path: "/login" },
-    { name: "Register", path: "/register" },
-  ];
-
-  // ✅ handle logo click → always go to login
-  const handleLogoClick = () => {
-    navigate("/login");
-  };
+export default function Navbar() {
+  const { pathname } = useLocation();
+  const isActive = (to) => pathname === to;
 
   return (
-    <motion.nav
-      initial={{ y: -60, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="bg-gradient-to-r from-blue-900 via-indigo-700 to-purple-700 text-white fixed w-full top-0 left-0 z-50 shadow-lg"
-    >
-      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-        {/* Logo */}
-        <button
-          onClick={handleLogoClick}
-          className="text-2xl font-extrabold tracking-wide hover:scale-105 transition transform"
-        >
-          MarketPulse360
-        </button>
+    <header className="absolute inset-x-0 top-0 z-20 px-4 md:px-8 pt-4">
+      <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white/90 text-slate-800 shadow-sm backdrop-blur md:border-white/10 md:bg-white/5 md:text-white md:shadow-lg">
+        <div className="flex items-center justify-between px-4 py-3 md:px-6">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg grid place-items-center bg-slate-900 text-white">
+              <span className="text-[10px] font-bold">MP</span>
+            </div>
+            <span className="text-sm font-semibold tracking-tight">MarketPulse360</span>
+          </div>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex space-x-8">
-          {navLinks.map((link) => (
+          <nav className="flex items-center gap-4 md:gap-6 text-sm">
+            <a href="#about" className="transition hover:opacity-80">About</a>
+            <a href="#contact" className="transition hover:opacity-80">Contact us</a>
             <Link
-              key={link.path}
-              to={link.path}
-              className={`relative font-medium text-lg transition ${
-                location.pathname === link.path
-                  ? "text-yellow-300"
-                  : "text-gray-100"
-              } hover:text-yellow-300`}
+              to="/login"
+              className={`transition hover:opacity-80 ${isActive("/login") ? "font-semibold underline underline-offset-4" : ""}`}
+              aria-current={isActive("/login") ? "page" : undefined}
             >
-              {link.name}
-              {location.pathname === link.path && (
-                <motion.span
-                  layoutId="underline"
-                  className="absolute left-0 -bottom-1 w-full h-[2px] bg-yellow-300 rounded"
-                />
-              )}
+              Login
             </Link>
-          ))}
+            <Link
+              to="/register"
+              className={`transition hover:opacity-80 ${isActive("/register") ? "font-semibold underline underline-offset-4" : ""}`}
+              aria-current={isActive("/register") ? "page" : undefined}
+            >
+              Register
+            </Link>
+          </nav>
         </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-white focus:outline-none"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
       </div>
-
-      {/* Mobile Menu Dropdown */}
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.4 }}
-          className="md:hidden bg-indigo-800/95 backdrop-blur-md px-6 py-4 space-y-3"
-        >
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              onClick={() => setIsOpen(false)}
-              className={`block font-medium text-lg ${
-                location.pathname === link.path
-                  ? "text-yellow-300"
-                  : "text-gray-100"
-              } hover:text-yellow-300 transition`}
-            >
-              {link.name}
-            </Link>
-          ))}
-        </motion.div>
-      )}
-    </motion.nav>
+    </header>
   );
 }
-
-export default Navbar;
